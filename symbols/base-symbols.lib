@@ -1,0 +1,90 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#
+# CAP
+#
+DEF ~CAP C 0 0 N N 1 F N
+F0 "C" -30 60 50 H V R CNN
+F1 "CAP" 0 0 50 H I C CNN
+F2 "-" 280 -150 50 H I C CNN
+F3 "-" 0 10 50 H I C CNN
+F4 "VALUE" 60 70 50 H V L CNN "Capacitance"
+F5 "DIE" 60 -70 50 H V L CNN "Dielectric"
+F6 "-" 200 -150 50 H I C CNN "Package"
+F7 "TOL" 110 -140 50 H I C CNN "Tolerance"
+F8 "VOLT" 60 0 50 H V L CNN "Voltage"
+DRAW
+P 2 0 1 0  -50 10  50 10 N
+P 2 0 1 0  0 -30  0 -10 N
+P 2 0 1 0  0 20  0 10 N
+P 2 0 1 0  50 -10  -50 -10 N
+X ~ 1 0 100 80 D 50 50 1 1 P
+X ~ 2 0 -100 80 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# CAP_NP
+#
+DEF ~CAP_NP C 0 0 N N 1 F N
+F0 "C" -30 60 50 H V R CNN
+F1 "CAP_NP" 0 0 50 H I C CNN
+F2 "-" 280 -150 50 H I C CNN
+F3 "-" 0 10 50 H I C CNN
+F4 "VALUE" 60 70 50 H V L CNN "Capacitance"
+F5 "DIE" 60 -70 50 H V L CNN "Dielectric"
+F6 "-" 200 -150 50 H I C CNN "Package"
+F7 "TOL" 110 -140 50 H I C CNN "Tolerance"
+F8 "VOLT" 60 0 50 H V L CNN "Voltage"
+DRAW
+P 2 0 1 0  -50 10  50 10 N
+P 2 0 1 0  0 -30  0 -10 N
+P 2 0 1 0  0 20  0 10 N
+P 2 0 1 0  50 -10  -50 -10 N
+X ~ 1 0 100 80 D 50 50 1 1 P
+X ~ 2 0 -100 80 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# CAP_P
+#
+DEF ~CAP_P C 0 0 N N 1 F N
+F0 "C" -30 60 50 H V R CNN
+F1 "CAP_P" 0 0 50 H I C CNN
+F2 "-" 280 -150 50 H I C CNN
+F3 "-" 0 10 50 H I C CNN
+F4 "VALUE" 60 70 50 H V L CNN "Capacitance"
+F5 "DIE" 60 -70 50 H V L CNN "Dielectric"
+F6 "-" 200 -150 50 H I C CNN "Package"
+F7 "TOL" 110 -140 50 H I C CNN "Tolerance"
+F8 "VOLT" 60 0 50 H V L CNN "Voltage"
+DRAW
+A 0 -80 71 1350 450 0 1 0 N -50 -30 50 -30
+P 2 0 1 0  -50 10  50 10 N
+P 2 0 1 0  -30 30  -30 50 N
+P 2 0 1 0  -20 40  -40 40 N
+P 2 0 1 0  0 -30  0 -10 N
+P 2 0 1 0  0 20  0 10 N
+X ~ 1 0 100 80 D 50 50 1 1 P
+X ~ 2 0 -100 80 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# RES
+#
+DEF ~RES R 0 0 N N 1 F N
+F0 "R" -40 140 50 H V R CNN
+F1 "RES" 0 0 50 H I C CNN
+F2 "-" 0 -30 60 H I C CNN
+F3 "-" 0 0 60 H I C CNN
+F4 "VALUE" 70 80 50 H V L CNN "Resistance"
+F5 "POW" 70 -70 50 H I L CNN "Power"
+F6 "-" 0 30 60 H I C CNN "Package"
+F7 "TOL" 70 0 50 H V L CNN "Tolerance"
+DRAW
+P 13 0 1 0  0 120  40 100  0 80  -40 60  0 40  40 20  0 0  -40 -20  0 -40  40 -60  0 -80  -40 -100  0 -120 N
+X ~ 1 0 200 80 D 50 50 1 1 P
+X ~ 2 0 -200 80 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+#End Library
