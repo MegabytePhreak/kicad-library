@@ -1,0 +1,27 @@
+EESchema-LIBRARY Version 2.4
+#encoding utf-8
+#
+# Y00015
+#
+DEF ~Y00015 Y 0 40 Y Y 1 F N
+F0 "Y" -50 200 50 H V C CNN
+F1 "Y00015" 0 -150 50 H I C CNN
+F2 "footprints:XTAL_2_5000X3200X1300_ABRACON" -150 100 50 H I C CNN
+F3 "https://abracon.com/Resonators/abm3.pdf" -50 200 50 H I C CNN
+F4 "Digi-Key" 50 300 50 H I C CNN "Supplier 1"
+F5 "535-10630-1-ND" 150 400 50 H I C CNN "Supplier 1 Part Number"
+F6 "Y00015" 250 500 50 H I C CNN "PARTNUMBER"
+F7 "8 MHz" 350 600 50 H V C CNN "Frequency"
+F8 "20ppm" 450 700 50 H V C CNN "Tolerance"
+F9 "18pF" 550 800 50 H V C CNN "Capacitance"
+DRAW
+S -30 -50 30 50 0 1 0 N
+P 2 0 1 0 50 -60 50 60 N
+P 2 0 1 0 50 0 100 0 N
+P 4 0 1 0 -100 0 -50 0 -50 60 -50 -60 N
+X ~ 1 -200 0 100 R 50 50 1 1 P
+X ~ 2 200 0 100 L 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+#End Library
