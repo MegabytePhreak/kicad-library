@@ -20,7 +20,7 @@ def tokenize(line):
         if escaped:
             escaped=False
         elif char == '\\':
-            excaped = True
+            escaped = True
         elif char == ' ' and not quoted:
             if in_tok:
                 tokens.append(line[start:pos])
@@ -52,9 +52,24 @@ def unquote(s):
 
     if '"' in s:
         # TODO: simple approach for now. Need to handle escapes
-        return s.strip('"')
-    else:
-        return s
+        s = s.strip('"')
+    
+    if s.find('\\'):
+        escaped = False;
+        s2 = []
+        for char in s:
+            if escaped:
+                escaped = False
+                s2.append(char)
+            else:
+                if char == '\\':
+                    escaped = True
+                else:
+                    escaped = False
+                    s2.append(char)
+        s = ''.join(s2)
+        
+    return s
 
 class Symbol:
 
@@ -91,6 +106,7 @@ class Symbol:
                 else:
                     tokens = tokenize(line)
                     if len(tokens) >= 10:
+                        #print(quote(name), tokens[9])
                         if tokens[9] == quote(name):
                             break
         else:
@@ -113,12 +129,20 @@ class Symbol:
         else:
             tokens = tokenize(self._lines[last])
             id = int(tokens[0][1:]) + 1
-            tokens[0] = 'F%d' % id
-            tokens[1] = quote(value)
-            tokens[6] = 'I'
-            tokens[9] = quote(name)
+            tokens = ['F%d' % id, quote(value), '0', '0',  '50', 'H', 'I', 'L', 'CNN',  quote(name)]
+            #tokens[0] = 'F%d' % id
+            #tokens[1] = quote(value)
+            #tokens[6] = 'I'
+            #tokens[9] = quote(name)
 
             self._lines.insert(last+1, " ".join(tokens))
+
+    def set_visible(self, name, visible):     
+        lineno = self._find_field_or_except(name)
+
+        tokens = tokenize(self._lines[lineno])
+        tokens[6] =  'V' if visible else 'I'
+        self._lines[lineno] = " ".join(tokens)
 
 
     def has_field(self, name):

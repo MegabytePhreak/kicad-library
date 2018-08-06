@@ -1,0 +1,62 @@
+{
+	"ignore_fields" : [
+		"SYMBOL"
+	], 
+	"translate_fields" : {
+		"PARTNUMBER" : "Name",
+		"DESCRIPTION" : "Description",
+		"POWER" : "Power", 
+		"TOLERANCE"  : "Tolerance",
+		"DIELECTRIC" : "Dielectric",
+		"PACKAGE" : "Package",
+		"VOLTAGE": "Voltage", 
+		"ComponentLink1URL" : "Datasheet", 
+		"MANUFACTURER" : "Manufacturer",
+		"FOOTPRINT" : "Footprint", 
+		"TYPE" : "Type",
+		"FREQUENCY": "Frequency"
+	},
+	"prepend_fields" : {
+		"Footprint" : "footprints:"
+	},
+	"visible_fields": [
+		"MANUFACTURER_PART_NUMBER"
+	],
+	"tables": {
+		"resistors" : {
+			"translate_fields" : {
+				"VALUE" : "Resistance"
+			},
+			"visible_fields" : [
+				"-MANUFACTURER_PART_NUMBER"
+			]
+		},
+		"capacitors" : {
+			"ignore_fields" : [
+				"POLARIZED"
+			],
+			"translate_fields" : {
+				"VALUE" : "Capacitance"
+			},
+			"visible_fields" : [
+				"-MANUFACTURER_PART_NUMBER"
+			]
+		},
+		"diodes" : {
+			"ignore_fields" : [
+				"NUMBER"
+			]
+		},
+		"crystals" : {
+			"translate_fields" : {
+				"CAPACITANCE" : "Capacitance"
+			},
+			"visible_fields" : [
+				"-MANUFACTURER_PART_NUMBER"
+			]
+		}
+	}
+	
+	
+	
+}
