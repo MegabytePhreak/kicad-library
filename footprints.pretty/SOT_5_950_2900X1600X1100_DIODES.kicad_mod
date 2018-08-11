@@ -1,8 +1,8 @@
-(module SOT_5_950_2900X1600_DIODES (layer F.Cu) (tedit 5B5D2005)
-  (fp_text reference REF** (at 0 2.6) (layer F.SilkS)
-    (effects (font (size 1 1) (thickness 0.15)))
+(module SOT_5_950_2900X1600X1100_DIODES (layer F.Cu) (tedit 5B6DFFC3)
+  (fp_text reference U1 (at 0 -2.5 180) (layer F.SilkS)
+    (effects (font (size 0.75 0.75) (thickness 0.18)))
   )
-  (fp_text value SOT_5_950_2900X1600_DIODES (at 0.75 -4.25) (layer F.Fab)
+  (fp_text value U00054 (at 0.75 -4.25) (layer F.Fab) hide
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (fp_line (start -1.75 -1.5) (end -0.75 -1.5) (layer F.SilkS) (width 0.15))
