@@ -1,8 +1,8 @@
-(module J_CUI_SJ1-3533NG (layer F.Cu) (tedit 5B5D417F)
-  (fp_text reference REF** (at -7.2 -6) (layer F.SilkS)
-    (effects (font (size 1 1) (thickness 0.15)))
+(module J_CUI_SJ1-3533NG (layer F.Cu) (tedit 5B6E4103)
+  (fp_text reference J1 (at 0.8 -4.5) (layer F.SilkS)
+    (effects (font (size 0.75 0.75) (thickness 0.18)))
   )
-  (fp_text value J_CUI_SJ1-3533NG (at 8.6 -7.6) (layer F.Fab) hide
+  (fp_text value CN00050 (at 8.6 -7.6) (layer F.Fab) hide
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (fp_line (start 0 4.9) (end 14 4.9) (layer F.Fab) (width 0.15))
@@ -19,7 +19,7 @@
   (pad 2 thru_hole circle (at 3.6 -1.1) (size 2.3 2.3) (drill 1.7) (layers *.Cu *.Mask))
   (pad 3 thru_hole circle (at 9.1 -1.1) (size 2.3 2.3) (drill 1.7) (layers *.Cu *.Mask))
   (model :LIB_MODELS:CUI_SJ1-3533NG.step
-    (offset (xyz -5.2 0 7))
+    (offset (xyz -4 0 7))
     (scale (xyz 1 1 1))
     (rotate (xyz 0 180 0))
   )
