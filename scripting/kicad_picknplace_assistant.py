@@ -12,8 +12,6 @@ from matplotlib.patches import Rectangle, Circle, Ellipse, FancyBboxPatch, Polyg
 def create_board_figure(pcb, bom_row, layer=pcbnew.F_Cu):
     qty, value, footpr, highlight_refs = bom_row
 
-    plt.figure(figsize=(5.8, 8.2))
-    ax = plt.subplot("111", aspect="equal")
 
     color_pad1 = "lightgray"
     color_pad2 = "#AA0000"
@@ -30,6 +28,9 @@ def create_board_figure(pcb, bom_row, layer=pcbnew.F_Cu):
     edge_coords = np.asarray(edge_coords) * 1e-6
     board_xmin, board_ymin = edge_coords.min(axis=0)
     board_xmax, board_ymax = edge_coords.max(axis=0)
+
+    plt.figure(figsize=((board_xmax-board_xmin)/25.4 + 1.5, (board_ymax-board_ymin)/25.4 + 1.5))
+    ax = plt.subplot("111", aspect="equal")
 
     # draw board edges
     rct = Rectangle((board_xmin, board_ymin), board_xmax - board_xmin, board_ymax - board_ymin, angle=0)
@@ -204,5 +205,5 @@ if __name__ == "__main__":
             create_board_figure(pcb, bom_row, layer=pcbnew.F_Cu)
             pdf.savefig()
             plt.close()
-            
+
     print("Output written to %s" % fname_out)
