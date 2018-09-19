@@ -6,13 +6,14 @@ from kicad_parsers.symbols import load_lib
 from copy import deepcopy
 from os import path
 import json
-from  pprint import pprint
+from pprint import pprint
 from collections import OrderedDict
 
+
 def merge_config(base, new):
-    for key,value in base.items():
+    for key, value in base.items():
         if key in new:
-            if hasattr(value,'update'):
+            if hasattr(value, 'update'):
                 value.update(new[key])
             else:
                 for item in new[key]:
@@ -22,34 +23,55 @@ def merge_config(base, new):
                     else:
                         value.append(item)
 
+
 def load_config(f, table):
-        config = { 'ignore_fields' : [], 'translate_fields' : {}, 'prepend_fields' : {}, 'visible_fields' : [] } 
-        if f:
-            json_config = json.load(f)
-            merge_config(config, json_config)
-            if 'tables' in json_config:
-                if table in json_config['tables']:
-                    table_config = json_config['tables'][table]
-                    merge_config(config, table_config)
+    config = {
+        'ignore_fields': [],
+        'translate_fields': {},
+        'prepend_fields': {},
+        'visible_fields': []
+    }
+    if f:
+        json_config = json.load(f)
+        merge_config(config, json_config)
+        if 'tables' in json_config:
+            if table in json_config['tables']:
+                table_config = json_config['tables'][table]
+                merge_config(config, table_config)
 
-        return config
-                
+    return config
 
-def parametrize(args = None):
 
-    parser = ArgumentParser(description='Parametrize Kicad Libraries from CSV files')
+def parametrize(args=None):
 
-    parser.add_argument('library', type=FileType('r'),
-                        help='Library to use as a basis for parametrization')
-    parser.add_argument('csv', type=FileType('r'),
-                        help='CSV file with rows for each parametrization of a symbol')
-    parser.add_argument('output_name', type=str, default='.',
-                        help='Name to give to output libraries')
-    parser.add_argument('--strict', type=bool, default=False,
-                        help='Require all symbols to be present')
-    parser.add_argument('-C','--config', type=FileType('r'), default=None, 
-                        help='Configuration File')
-    
+    parser = ArgumentParser(
+        description='Parametrize Kicad Libraries from CSV files')
+
+    parser.add_argument(
+        'library',
+        type=FileType('r'),
+        help='Library to use as a basis for parametrization')
+    parser.add_argument(
+        'csv',
+        type=FileType('r'),
+        help='CSV file with rows for each parametrization of a symbol')
+    parser.add_argument(
+        'output_name',
+        type=str,
+        default='.',
+        help='Name to give to output libraries')
+    parser.add_argument(
+        '--strict',
+        type=bool,
+        default=False,
+        help='Require all symbols to be present')
+    parser.add_argument(
+        '-C',
+        '--config',
+        type=FileType('r'),
+        default=None,
+        help='Configuration File')
+
     if args:
         args = parser.parse_args(args)
     else:
@@ -57,40 +79,39 @@ def parametrize(args = None):
 
     config = load_config(args.config, path.basename(args.output_name))
     #pprint(config)
-    
+
     symbol_lib = {x.get_field('Name'): x for x in load_lib(args.library)}
     symbols = []
-
 
     csv_data = csv.DictReader(args.csv)
     csv_data = list(csv_data)
     csv_data.sort(key=lambda x: x['PARTNUMBER'])
-    
+
     for row in csv_data:
         symbol_name = row['SYMBOL']
         if not args.strict and not symbol_name in symbol_lib:
-            print("Symbol '%s' not found for part '%s', skipping" % (symbol_name, row["PARTNUMBER"]))
+            print("Symbol '%s' not found for part '%s', skipping" %
+                  (symbol_name, row["PARTNUMBER"]))
             continue
-            
+
         symbol = deepcopy(symbol_lib[symbol_name])
-    
-        for key,value in row.items():
+
+        for key, value in row.items():
             if key in config['ignore_fields']:
                 continue
             if key in config['translate_fields']:
                 key = config['translate_fields'][key]
 
-                    
             if value == '' or value is None:
                 value = '~'
             elif key in config['prepend_fields']:
                 value = config['prepend_fields'][key] + value
-                    
+
             #print("Adding field '%s' = '%s'" % (key, value))
-            symbol.set_or_add_field(key,value)
+            symbol.set_or_add_field(key, value)
 
             if key in config['visible_fields']:
-                symbol.set_visible(key, True);
+                symbol.set_visible(key, True)
 
         symbols.append(symbol)
 
@@ -108,15 +129,6 @@ def parametrize(args = None):
                 output.write('D %s\n' % symbol.get_field('Description'))
                 output.write('$ENDCMP\n')
 
+
 if __name__ == '__main__':
     parametrize()
-
-
-
-
-
-
-
-
-
-

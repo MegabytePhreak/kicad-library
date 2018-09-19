@@ -8,17 +8,22 @@ from io import StringIO
 #F5 "785-1067-1-ND" -50 -750 60 H I C CNN "Supplier 1 Part Number"
 #F3 "http://aosmd.com/res/data_sheets/AO6400.pdf" 250 -850 60 H I C CNN
 
+
 def test_tokenize():
-    assert tokenize('F0 "Q" 300 50 60 H V C CNN') == ['F0', '"Q"', '300', '50', '60', 'H', 'V', 'C', 'CNN']
+    assert tokenize('F0 "Q" 300 50 60 H V C CNN') == [
+        'F0', '"Q"', '300', '50', '60', 'H', 'V', 'C', 'CNN'
+    ]
     assert tokenize('F5 "785-1067-1-ND" -50 -750 60 H I C CNN "Supplier 1 Part Number"') == \
         ['F5', '"785-1067-1-ND"', '-50', '-750', '60', 'H', 'I', 'C', 'CNN', '"Supplier 1 Part Number"']
     assert tokenize('F3  "http://aosmd.com/res/data_sheets/AO6400.pdf" 250    -850 60 H I C CNN  ') == \
         ['F3', '"http://aosmd.com/res/data_sheets/AO6400.pdf"', '250', '-850', '60', 'H', 'I', 'C', 'CNN']
 
+
 def test_quote():
     assert quote('785-1067-1-ND') == '"785-1067-1-ND"'
     assert quote('Supplier 1 Part Number') == '"Supplier 1 Part Number"'
-    assert quote('Supplier 1 Part Number', if_needed=True) == '"Supplier 1 Part Number"'
+    assert quote(
+        'Supplier 1 Part Number', if_needed=True) == '"Supplier 1 Part Number"'
     assert quote('CNN', if_needed=True) == 'CNN'
 
 
@@ -57,6 +62,7 @@ ENDDEF
 #End Library
 """
 
+
 def test_load_lib_1():
     symbols = load_lib(StringIO(TEST_LIB_DATA))
 
@@ -89,28 +95,33 @@ ENDDRAW
 ENDDEF\
 """
 
-def test_field_read():
-     symbol = load_lib(StringIO(TEST_LIB_DATA))[0]
 
-     assert symbol.get_field('Name') == 'AO6400'
-     assert symbol.get_field('Reference') == 'Q'
-     assert symbol.get_field('Footprint') == 'Footprints:TSOP_6_950_3100X1700_AO'
-     assert symbol.get_field('Datasheet') == 'http://aosmd.com/res/data_sheets/AO6400.pdf'
-     assert symbol.get_field('Supplier 1') == 'Digi-Key'
+def test_field_read():
+    symbol = load_lib(StringIO(TEST_LIB_DATA))[0]
+
+    assert symbol.get_field('Name') == 'AO6400'
+    assert symbol.get_field('Reference') == 'Q'
+    assert symbol.get_field(
+        'Footprint') == 'Footprints:TSOP_6_950_3100X1700_AO'
+    assert symbol.get_field(
+        'Datasheet') == 'http://aosmd.com/res/data_sheets/AO6400.pdf'
+    assert symbol.get_field('Supplier 1') == 'Digi-Key'
+
 
 def test_field_write():
-     symbol = load_lib(StringIO(TEST_LIB_DATA))[0]
+    symbol = load_lib(StringIO(TEST_LIB_DATA))[0]
 
-     symbol.set_name('abcd')
-     assert symbol.get_field('Name') == 'abcd'
+    symbol.set_name('abcd')
+    assert symbol.get_field('Name') == 'abcd'
 
-     symbol.set_reference('M')
-     assert symbol.get_field('Reference') == 'M'
+    symbol.set_reference('M')
+    assert symbol.get_field('Reference') == 'M'
 
-     assert symbol._lines[0] == 'DEF abcd M 0 0 Y N 1 F N'
+    assert symbol._lines[0] == 'DEF abcd M 0 0 Y N 1 F N'
+
 
 def test_field_create():
     symbol = load_lib(StringIO(TEST_LIB_DATA))[0]
 
-    symbol.set_or_add_field("Test Field","Test Value")
+    symbol.set_or_add_field("Test Field", "Test Value")
     assert symbol.get_field("Test Field") == "Test Value"

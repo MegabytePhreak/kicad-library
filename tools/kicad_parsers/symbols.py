@@ -1,13 +1,15 @@
 __author__ = 'MegabytePhreak'
 
-
 import re
+
 
 class ParseError(Exception):
     pass
 
+
 class FieldNotFoundException(Exception):
     pass
+
 
 def tokenize(line):
 
@@ -18,14 +20,14 @@ def tokenize(line):
     in_tok = False
     for pos, char in enumerate(line):
         if escaped:
-            escaped=False
+            escaped = False
         elif char == '\\':
             escaped = True
         elif char == ' ' and not quoted:
             if in_tok:
                 tokens.append(line[start:pos])
                 in_tok = False
-            start = pos+1
+            start = pos + 1
         elif char == '"':
             in_tok = True
             quoted = not quoted
@@ -35,6 +37,7 @@ def tokenize(line):
         tokens.append(line[start:])
 
     return tokens
+
 
 def quote(s, if_needed=False):
     if (not if_needed) or re.search(r'[\s"]', s):
@@ -48,14 +51,15 @@ def quote(s, if_needed=False):
 
     return s
 
+
 def unquote(s):
 
     if '"' in s:
         # TODO: simple approach for now. Need to handle escapes
         s = s.strip('"')
-    
+
     if s.find('\\'):
-        escaped = False;
+        escaped = False
         s2 = []
         for char in s:
             if escaped:
@@ -68,11 +72,11 @@ def unquote(s):
                     escaped = False
                     s2.append(char)
         s = ''.join(s2)
-        
+
     return s
 
-class Symbol:
 
+class Symbol:
     @staticmethod
     def load_from_string(text):
         return Symbol(text.split('\n'))
@@ -88,7 +92,7 @@ class Symbol:
 
     def _find_field_or_last(self, name):
         last = None
-        for lineno,line in enumerate(self._lines):
+        for lineno, line in enumerate(self._lines):
             if line[0] == 'F':
                 last = lineno
                 if name == 'Reference':
@@ -110,13 +114,14 @@ class Symbol:
                         if tokens[9] == quote(name):
                             break
         else:
-            return (None,last)
+            return (None, last)
         return (lineno, last)
 
     def _find_field_or_except(self, name):
         lineno, last = self._find_field_or_last(name)
         if lineno is None:
-            raise FieldNotFoundException("Unable to find field '%s' in symbol '%s'", name, self)
+            raise FieldNotFoundException(
+                "Unable to find field '%s' in symbol '%s'", name, self)
 
         return lineno
 
@@ -129,21 +134,24 @@ class Symbol:
         else:
             tokens = tokenize(self._lines[last])
             id = int(tokens[0][1:]) + 1
-            tokens = ['F%d' % id, quote(value), '0', '0',  '50', 'H', 'I', 'L', 'CNN',  quote(name)]
+            tokens = [
+                'F%d' % id,
+                quote(value), '0', '0', '50', 'H', 'I', 'L', 'CNN',
+                quote(name)
+            ]
             #tokens[0] = 'F%d' % id
             #tokens[1] = quote(value)
             #tokens[6] = 'I'
             #tokens[9] = quote(name)
 
-            self._lines.insert(last+1, " ".join(tokens))
+            self._lines.insert(last + 1, " ".join(tokens))
 
-    def set_visible(self, name, visible):     
+    def set_visible(self, name, visible):
         lineno = self._find_field_or_except(name)
 
         tokens = tokenize(self._lines[lineno])
-        tokens[6] =  'V' if visible else 'I'
+        tokens[6] = 'V' if visible else 'I'
         self._lines[lineno] = " ".join(tokens)
-
 
     def has_field(self, name):
         lineno, last = self._find_field_or_last(name)
@@ -192,27 +200,26 @@ class Symbol:
         return "\n".join(self._lines)
 
 
-
 def load_lib(f):
 
     symbols = []
-    filename = f.filename if hasattr(f,'filename') else '<unknown>'
+    filename = f.filename if hasattr(f, 'filename') else '<unknown>'
 
     lines = f.readlines()
     start = None
     for lineno, line in enumerate(lines):
         if line.startswith('DEF '):
             if start is not None:
-                raise ParseError('%s:%d: Nested DEF', filename, lineno+1)
+                raise ParseError('%s:%d: Nested DEF', filename, lineno + 1)
             else:
                 start = lineno
         elif line.startswith('ENDDEF'):
             if start is not None:
-                symbols.append(Symbol([x.strip() for x in lines[start:lineno+1]]))
+                symbols.append(
+                    Symbol([x.strip() for x in lines[start:lineno + 1]]))
                 start = None
             else:
-                raise ParseError('%s:%d: Unexpected ENDDEF', filename, lineno+1)
+                raise ParseError('%s:%d: Unexpected ENDDEF', filename,
+                                 lineno + 1)
 
     return symbols
-
-

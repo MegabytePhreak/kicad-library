@@ -1,5 +1,4 @@
 #!/usr/bin/python2
-
 """
 Render paged pdf highlighting the installation locations for each
 component on a board, grouped by part number
@@ -14,8 +13,7 @@ import cairo
 import pango
 import pangocairo
 
-
-POINTS_PER_MM = 72.0/25.4
+POINTS_PER_MM = 72.0 / 25.4
 
 BBOX_BASE_FILL = cairo.SolidPattern(0.8, 0.8, 0.8, 0.3)
 BBOX_HIGHLIGHT_FILL = cairo.SolidPattern(0.5, 0.5, 0.5, 0.5)
@@ -28,10 +26,13 @@ PAD1_HIGHLIGHT_STROKE = cairo.SolidPattern(0.2, 0.2, 0.2, 1.0)
 
 
 class FootprintRenderStyle(object):
-
-    def __init__(self, bbox_stroke=None, bbox_fill=BBOX_BASE_FILL,
-                 pad_stroke=None, pad_fill=PAD_BASE_FILL,
-                 pad1_stroke=None, pad1_fill=PAD_BASE_FILL):
+    def __init__(self,
+                 bbox_stroke=None,
+                 bbox_fill=BBOX_BASE_FILL,
+                 pad_stroke=None,
+                 pad_fill=PAD_BASE_FILL,
+                 pad1_stroke=None,
+                 pad1_fill=PAD_BASE_FILL):
         self.bbox_stroke = bbox_stroke
         self.bbox_fill = bbox_fill
         self.pad_stroke = pad_stroke
@@ -50,7 +51,7 @@ class Point(object):
             self.y = args[1]
 
     def __mul__(self, other):
-        return Point(self.x*other, self.y*other)
+        return Point(self.x * other, self.y * other)
 
     def __getitem__(self, idx):
         if idx == 0 or idx == 'x':
@@ -63,9 +64,11 @@ class Point(object):
 
 BASE_STYLE = FootprintRenderStyle()
 HIGHLIGHT_STYLE = FootprintRenderStyle(
-        bbox_fill=BBOX_HIGHLIGHT_FILL, bbox_stroke=BBOX_HIGHLIGHT_STROKE,
-        pad_fill=PAD_HIGHLIGHT_FILL,
-        pad1_fill=PAD_HIGHLIGHT_FILL, pad1_stroke=PAD1_HIGHLIGHT_STROKE)
+    bbox_fill=BBOX_HIGHLIGHT_FILL,
+    bbox_stroke=BBOX_HIGHLIGHT_STROKE,
+    pad_fill=PAD_HIGHLIGHT_FILL,
+    pad1_fill=PAD_HIGHLIGHT_FILL,
+    pad1_stroke=PAD1_HIGHLIGHT_STROKE)
 
 
 def get_bbox(pcb):
@@ -83,28 +86,27 @@ def get_bbox(pcb):
     xmax = max(xs) * 1e-6
     ymax = max(ys) * 1e-6
 
-    return xmin, ymin, xmax-xmin, ymax-ymin
+    return xmin, ymin, xmax - xmin, ymax - ymin
 
 
 def render_rect(ctx, size):
-    ctx.rectangle(-size.x/2, -size.y/2, size.x, size.y)
+    ctx.rectangle(-size.x / 2, -size.y / 2, size.x, size.y)
 
 
 def render_rounded_rect(ctx, size, radius):
     # Render the corners, cairo will connect the arcs
-    ctx.arc(size.x/2 - radius, size.y/2 - radius, radius,
-            0, math.pi/2)
-    ctx.arc(-size.x/2 + radius, size.y/2 - radius, radius,
-            math.pi/2, math.pi)
-    ctx.arc(-size.x/2 + radius, -size.y/2 + radius, radius,
-            math.pi, 3*math.pi/2)
-    ctx.arc(size.x/2 - radius, -size.y/2 + radius, radius,
-            3*math.pi/2, 2*math.pi)
+    ctx.arc(size.x / 2 - radius, size.y / 2 - radius, radius, 0, math.pi / 2)
+    ctx.arc(-size.x / 2 + radius, size.y / 2 - radius, radius, math.pi / 2,
+            math.pi)
+    ctx.arc(-size.x / 2 + radius, -size.y / 2 + radius, radius, math.pi,
+            3 * math.pi / 2)
+    ctx.arc(size.x / 2 - radius, -size.y / 2 + radius, radius, 3 * math.pi / 2,
+            2 * math.pi)
     ctx.close_path()
 
 
 def render_oval(ctx, size):
-    render_rounded_rect(ctx, size, min(size)/2)
+    render_rounded_rect(ctx, size, min(size) / 2)
 
 
 def render_trapezoid(ctx, size, delta):
@@ -112,10 +114,10 @@ def render_trapezoid(ctx, size, delta):
     # See D_PAD::BuildPadPolygon in kicad source
     size = size * 0.5
     delta = delta * 0.5
-    ctx.move_to(-size.x-delta.y, size.y+delta.x)
-    ctx.line_to(-size.x+delta.y, -size.y-delta.x)
-    ctx.line_to(size.x-delta.y, -size.y+delta.x)
-    ctx.line_to(size.x+delta.y, size.y-delta.x)
+    ctx.move_to(-size.x - delta.y, size.y + delta.x)
+    ctx.line_to(-size.x + delta.y, -size.y - delta.x)
+    ctx.line_to(size.x - delta.y, -size.y + delta.x)
+    ctx.line_to(size.x + delta.y, size.y - delta.x)
     ctx.close_path()
 
 
@@ -148,23 +150,23 @@ def render_footprint(ctx, fp, style):
         ctx.new_path()
         ctx.save()
         ctx.translate(pos.x, pos.y)
-        ctx.rotate(math.pi/180.0 * angle)
+        ctx.rotate(math.pi / 180.0 * angle)
 
         custom = False
-        if(shape == pcbnew.PAD_SHAPE_CUSTOM):
+        if (shape == pcbnew.PAD_SHAPE_CUSTOM):
             custom = True
             shape = p.GetAnchorPadShape()
 
         if shape == pcbnew.PAD_SHAPE_RECT:
             render_rect(ctx, size)
         elif shape == pcbnew.PAD_SHAPE_ROUNDRECT:
-            render_rounded_rect(ctx, size, p.GetRoundRectCornerRadius()*1e-6)
+            render_rounded_rect(ctx, size, p.GetRoundRectCornerRadius() * 1e-6)
         elif shape == pcbnew.PAD_SHAPE_OVAL:
             render_oval(ctx, size)
         elif shape == pcbnew.PAD_SHAPE_CIRCLE:
-            ctx.arc(0, 0, size.x/2, 0, 2*math.pi)
+            ctx.arc(0, 0, size.x / 2, 0, 2 * math.pi)
         elif shape == pcbnew.PAD_SHAPE_TRAPEZOID:
-            render_trapezoid(ctx, size, Pouint(p.GetDelta())*1e-6)
+            render_trapezoid(ctx, size, Pouint(p.GetDelta()) * 1e-6)
         else:
             print("Unsupported pad shape: {0} ".format(shape))
             ctx.restore()
@@ -202,7 +204,7 @@ def render_text(ctx, x, y, width, text, align_bottom=False):
 
     layout = ctx.create_layout()
     font = pango.FontDescription("Sans 2")
-    font.set_size(max(2, width/50)*pango.SCALE)
+    font.set_size(max(2, width / 50) * pango.SCALE)
     layout.set_font_description(font)
     layout.set_width(int(width * pango.SCALE))
     layout.set_wrap(pango.WRAP_WORD_CHAR)
@@ -266,6 +268,7 @@ def generate_bom(pcb, filter_layer=None):
     def sort_func(row):
         ref_ord = REFDES_PRIORITY.get(row.refs[0][0], 0)
         return -ref_ord, -len(row.refs)
+
     bom_table = sorted(bom_table, key=sort_func)
 
     return bom_table
@@ -300,17 +303,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='KiCad PCB pick and place assistant')
     parser.add_argument('FILE', type=str, help="KiCad PCB file")
-    parser.add_argument('-s', '--side',
-                        choices=OrderedDict((
-                                 ('front', pcbnew.F_Cu),
-                                 ('top', pcbnew.F_Cu),
-                                 ('back', pcbnew.B_Cu),
-                                 ('bottom', pcbnew.B_Cu))),
-                        default=pcbnew.F_Cu,
-                        help="Board side (default top)")
-    parser.add_argument('-o', '--output', type=str,
-                        help="Output PDF file, default <FILE>_picknplace.pdf",
-                        default=None)
+    parser.add_argument(
+        '-s',
+        '--side',
+        choices=OrderedDict((('front', pcbnew.F_Cu), ('top', pcbnew.F_Cu),
+                             ('back', pcbnew.B_Cu), ('bottom', pcbnew.B_Cu))),
+        default=pcbnew.F_Cu,
+        help="Board side (default top)")
+    parser.add_argument(
+        '-o',
+        '--output',
+        type=str,
+        help="Output PDF file, default <FILE>_picknplace.pdf",
+        default=None)
     args = parser.parse_args()
 
     # build BOM
@@ -341,25 +346,26 @@ if __name__ == "__main__":
         fname_out = os.path.splitext(args.FILE)[0] + "_picknplace.pdf"
     with cairo.PDFSurface(fname_out, 72, 72) as pdf:
         for i, bom_row in enumerate(bom_table):
-            print("Plotting page (%d/%d)" % (i+1, len(bom_table)))
-            pdf.set_size((board_width + 2*margin.x)*POINTS_PER_MM,
-                         (board_height + 2*margin.y)*POINTS_PER_MM)
+            print("Plotting page (%d/%d)" % (i + 1, len(bom_table)))
+            pdf.set_size((board_width + 2 * margin.x) * POINTS_PER_MM,
+                         (board_height + 2 * margin.y) * POINTS_PER_MM)
             ctx = pangocairo.CairoContext(cairo.Context(pdf))
 
             # Scale from points to mm
             ctx.scale(POINTS_PER_MM, POINTS_PER_MM)
             # Render Text
-            render_text(ctx, text_margin.x, margin.y-text_margin.y,
-                        board_width+2*margin.x-2*text_margin.x,
-                        "%dx %s, %s" % (
-                            len(bom_row.refs),
-                            bom_row.value,
-                            bom_row.footprint),
-                        align_bottom=True)
-            render_text(ctx,
-                        text_margin.x, board_height+margin.y+text_margin.y,
-                        board_width+2*margin.x-2*text_margin.x,
-                        ", ".join(bom_row.refs))
+            render_text(
+                ctx,
+                text_margin.x,
+                margin.y - text_margin.y,
+                board_width + 2 * margin.x - 2 * text_margin.x,
+                "%dx %s, %s" % (len(bom_row.refs), bom_row.value,
+                                bom_row.footprint),
+                align_bottom=True)
+            render_text(
+                ctx, text_margin.x, board_height + margin.y + text_margin.y,
+                board_width + 2 * margin.x - 2 * text_margin.x, ", ".join(
+                    bom_row.refs))
 
             # Offset within page for margins+header
             ctx.translate(margin.x, margin.y)
@@ -367,8 +373,12 @@ if __name__ == "__main__":
             ctx.translate(-board_xmin, -board_ymin)
             ctx.set_source_surface(base, 0.0, 0.0)
             ctx.paint()
-            render_footprints(pcb, ctx, footprints, HIGHLIGHT_STYLE,
-                              include_only=bom_row.refs)
+            render_footprints(
+                pcb,
+                ctx,
+                footprints,
+                HIGHLIGHT_STYLE,
+                include_only=bom_row.refs)
             pdf.show_page()
 
     print("Output written to %s" % fname_out)
