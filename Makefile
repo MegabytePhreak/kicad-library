@@ -3,7 +3,7 @@ PYTHON ?= python3
 
 BASE_SYMBOLS := symbols/base-symbols.lib
 
-DATABASE ?= "${DATABASE}"
+DATABASE ?= "../../../../Dropbox/Altium Libraries/Components/Components.mdb"
 
 all: generated/resistors.lib \
      generated/capacitors.lib \
