@@ -36,6 +36,8 @@ def myEqu(self, other):
         result = False
     elif self.getFootprint() != other.getFootprint():
         result = False
+    elif self.getField("DNP") !=  other.getField("DNP"):
+        result = False
 
     return result
 
@@ -93,23 +95,17 @@ writerow( out, ['Date:', net.getDate()] )
 writerow( out, ['Tool:', net.getTool()] )
 writerow( out, ['Generator:', sys.argv[0]] )
 writerow( out, ['Component Count:', len(components)] )
-writerow( out, [] )
-writerow( out, ['Individual Components:'] )
 writerow( out, [] )                        # blank line
 writerow( out, columns )
-
-# Output all the interesting components individually first:
-row = []
-
-writerow( out, [] )                        # blank line
-writerow( out, columns )                   # reuse same columns
 
 # Get all of the components in groups of matching parts + values
 # (see kicad_netlist_reader.py)
 grouped = net.groupComponents(components)
+grouped = sorted(grouped, key=lambda g: g[0].getField("DNP"))
 
 # Output component information organized by group, aka as collated:
 item = 0
+row = []
 for group in grouped:
     del row[:]
     refs = ""
