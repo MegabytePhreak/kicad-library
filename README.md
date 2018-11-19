@@ -2,6 +2,9 @@
 # kicad-library
 
 My database/csv backed KiCAD library implementation.
+
+After cloning/updating  make sure to run make to generate the actual KiCAD libraries.
+
 The structure of these libraries is that each component in the final library is created from three distinct items:
 1. The PCB footprint, repesented by standard KiCAD footprints in the footprints.pretty directory.
 2. The symbol, which is logically represented by the symbols in the base-symbols library under the symbols directory. AS KiCAD lacks a symbol/part abstraction, physically these are copies to the output libraries.
