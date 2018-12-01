@@ -7,6 +7,7 @@ Based on https://gist.github.com/pwuertz/152f15b2dadca9a74039aeab944714af
 
 """
 
+import argparse
 import re
 import os
 from collections import namedtuple, OrderedDict
@@ -249,8 +250,6 @@ def generate_bom(pcb, filter_layer=None, filter_refs=None):
     """
     BomRow = namedtuple("BomRow", ['value', 'footprint', 'refs'])
 
-    print filter_refs
-
     # build grouped part list
     part_groups = {}
     for m in pcb.GetModules():
@@ -265,7 +264,6 @@ def generate_bom(pcb, filter_layer=None, filter_refs=None):
         group_key = (value, footpr)
         refs = part_groups.setdefault(group_key, [])
         refs.append(m.GetReference())
-    print part_groups
 
     # build bom table, sort refs
     bom_table = []
@@ -306,45 +304,19 @@ def load_footprints(pcb, layer=None):
     return f
 
 
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='KiCad PCB pick and place assistant')
-    parser.add_argument('FILE', type=str, help="KiCad PCB file")
-    parser.add_argument(
-        '-s',
-        '--side',
-        choices=OrderedDict((('front', pcbnew.F_Cu), ('top', pcbnew.F_Cu),
-                             ('back', pcbnew.B_Cu), ('bottom', pcbnew.B_Cu))),
-        default=pcbnew.F_Cu,
-        help="Board side (default top)")
-    parser.add_argument(
-        '-n',
-        '--netlist',
-        type=str,
-        default=None,
-        help="XML Netlist file for DNP detection")
-    parser.add_argument(
-        '-o',
-        '--output',
-        type=str,
-        help="Output PDF file, default <FILE>_picknplace.pdf",
-        default=None)
-    args = parser.parse_args()
-
+def process(pcbfile, side=pcbnew.F_Cu, netlist=None, output=None):
     refs = None
 
     # load netlist
-    if args.netlist is not None:
-        net = kicad_netlist_reader.netlist(args.netlist)
+    if netlist is not None:
+        net = kicad_netlist_reader.netlist(netlist)
         refs = [x.getRef() for x in net.getInterestingComponents()]
 
     # build BOM
-    print("Loading %s" % args.FILE)
-    pcb = pcbnew.LoadBoard(args.FILE)
-    bom_table = generate_bom(pcb, filter_layer=args.side, filter_refs=refs)
-    footprints = load_footprints(pcb, layer=args.side)
+    print("Loading %s" % pcbfile)
+    pcb = pcbnew.LoadBoard(pcbfile)
+    bom_table = generate_bom(pcb, filter_layer=side, filter_refs=refs)
+    footprints = load_footprints(pcb, layer=side)
     board_xmin, board_ymin, board_width, board_height = get_bbox(pcb)
     margin = Point(5, 15)
     text_margin = Point(5, 2)
@@ -363,9 +335,12 @@ if __name__ == "__main__":
     ctx.stroke()
 
     # for each part group, print page to PDF
-    fname_out = args.output
-    if args.output is None:
-        fname_out = os.path.splitext(args.FILE)[0] + "_picknplace.pdf"
+    fname_out = output
+    if output is None:
+        sidename = "top" if side == pcbnew.F_Cu else "bottom"
+        fname_out = os.path.splitext(
+            pcbfile)[0] + "_place_" + sidename + ".pdf"
+
     with cairo.PDFSurface(fname_out, 72, 72) as pdf:
         for i, bom_row in enumerate(bom_table):
             print("Plotting page (%d/%d)" % (i + 1, len(bom_table)))
@@ -404,3 +379,34 @@ if __name__ == "__main__":
             pdf.show_page()
 
     print("Output written to %s" % fname_out)
+
+
+layerchoices = OrderedDict((('front', pcbnew.F_Cu), ('top', pcbnew.F_Cu),
+                            ('back', pcbnew.B_Cu), ('bottom', pcbnew.B_Cu)))
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        description='KiCad PCB pick and place assistant')
+    parser.add_argument('FILE', type=str, help="KiCad PCB file")
+    parser.add_argument(
+        '-s',
+        '--side',
+        choices=layerchoices,
+        default="top",
+        help="Board side (default top)")
+    parser.add_argument(
+        '-n',
+        '--netlist',
+        type=str,
+        default=None,
+        help="XML Netlist file for DNP detection")
+    parser.add_argument(
+        '-o',
+        '--output',
+        type=str,
+        help="Output PDF file, default <FILE>_picknplace.pdf",
+        default=None)
+    args = parser.parse_args()
+
+    process(args.FILE, layerchoices[args.side], args.netlist, args.output)
