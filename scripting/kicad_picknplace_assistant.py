@@ -2,6 +2,9 @@
 """
 Render paged pdf highlighting the installation locations for each
 component on a board, grouped by part number
+
+Based on https://gist.github.com/pwuertz/152f15b2dadca9a74039aeab944714af
+
 """
 
 import re
@@ -12,6 +15,7 @@ import math
 import cairo
 import pango
 import pangocairo
+import kicad_netlist_reader
 
 POINTS_PER_MM = 72.0 / 25.4
 
@@ -237,7 +241,7 @@ def natural_sort(l):
 REFDES_PRIORITY = {"U": 5, "R": 2, "C": 1, "L": 3, "D": 4, "J": -1, "P": -1}
 
 
-def generate_bom(pcb, filter_layer=None):
+def generate_bom(pcb, filter_layer=None, filter_refs=None):
     """
     Generate BOM from pcb layout.
     :param filter_layer: include only parts for given layer
@@ -245,11 +249,15 @@ def generate_bom(pcb, filter_layer=None):
     """
     BomRow = namedtuple("BomRow", ['value', 'footprint', 'refs'])
 
+    print filter_refs
+
     # build grouped part list
     part_groups = {}
     for m in pcb.GetModules():
         # filter part by layer
         if filter_layer is not None and filter_layer != m.GetLayer():
+            continue
+        if filter_refs is not None and m.GetReference() not in filter_refs:
             continue
         # group part refs by value and footprint
         value = m.GetValue()
@@ -257,6 +265,7 @@ def generate_bom(pcb, filter_layer=None):
         group_key = (value, footpr)
         refs = part_groups.setdefault(group_key, [])
         refs.append(m.GetReference())
+    print part_groups
 
     # build bom table, sort refs
     bom_table = []
@@ -311,6 +320,12 @@ if __name__ == "__main__":
         default=pcbnew.F_Cu,
         help="Board side (default top)")
     parser.add_argument(
+        '-n',
+        '--netlist',
+        type=str,
+        default=None,
+        help="XML Netlist file for DNP detection")
+    parser.add_argument(
         '-o',
         '--output',
         type=str,
@@ -318,10 +333,17 @@ if __name__ == "__main__":
         default=None)
     args = parser.parse_args()
 
+    refs = None
+
+    # load netlist
+    if args.netlist is not None:
+        net = kicad_netlist_reader.netlist(args.netlist)
+        refs = [x.getRef() for x in net.getInterestingComponents()]
+
     # build BOM
     print("Loading %s" % args.FILE)
     pcb = pcbnew.LoadBoard(args.FILE)
-    bom_table = generate_bom(pcb, filter_layer=args.side)
+    bom_table = generate_bom(pcb, filter_layer=args.side, filter_refs=refs)
     footprints = load_footprints(pcb, layer=args.side)
     board_xmin, board_ymin, board_width, board_height = get_bbox(pcb)
     margin = Point(5, 15)

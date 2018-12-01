@@ -612,7 +612,7 @@ class netlist():
             if not exclude:
                 # This is a fairly personal way to flag DNS (Do Not Stuff).  NU for
                 # me means Normally Uninstalled.  You can 'or in' another expression here.
-                if c.getField( "Installed" ) == 'NU' or c.getField("BOM_IGNORE") == '1':
+                if c.getField( "DNP" ) == 'DNP' or c.getField("BOM_IGNORE") == '1':
                     exclude = True
 
             if not exclude:
